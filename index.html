@@ -225,4 +225,248 @@
       color: #d35400;
       cursor: pointer;
       text-transform: uppercase;
-      font-size:
+      font-size: 0.95em;
+    }
+    details p, details ul {
+      font-size: 0.85em;
+      color: #ccc;
+      margin-top: 8px;
+      margin-bottom: 5px;
+      line-height: 1.4;
+    }
+    details ul { padding-left: 18px; }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <h1>🩸 Vampire V5 Companion</h1>
+
+  <!-- PANEL DE TRACKERS -->
+  <div class="tracker-grid">
+    <div class="tracker-box">
+      <label>Salud (Health)</label>
+      <div class="tracker-cells" id="healthCells"></div>
+    </div>
+    <div class="tracker-box">
+      <label>Voluntad (Willpower)</label>
+      <div class="tracker-cells" id="willpowerCells"></div>
+    </div>
+  </div>
+
+  <!-- CONTROLES DE DADOS Y ANSIA -->
+  <div class="controls">
+    <div class="control-group">
+      <label>Reserva Total</label>
+      <input type="number" id="dicePool" value="6" min="1" max="20">
+    </div>
+    <div class="control-group">
+      <label>Ansia (Hunger)</label>
+      <div class="hunger-controls">
+        <button class="btn-step" onclick="changeHunger(-1)">-</button>
+        <input type="number" id="hungerPool" value="1" min="0" max="5" readonly style="width: 50px;">
+        <button class="btn-step" onclick="changeHunger(1)">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-container">
+    <button class="btn-roll" onclick="rollV5Dice()">Tirar Dados 🎲</button>
+    <button class="btn-rouse" onclick="rouseCheck()">Enrutamiento 🩸</button>
+  </div>
+
+  <!-- RESULTADOS DE LA TIRADA -->
+  <div class="results-box">
+    <div id="summary" style="font-weight: bold; font-size: 1.1em; text-align: center;">Tira los dados para ver el resultado...</div>
+    <div id="status" class="status-msg"></div>
+    <div id="diceArea" class="dice-container"></div>
+  </div>
+
+  <!-- GUÍA RÁPIDA DE REGLAS V5 -->
+  <div class="section-title">📜 Referencia Rápida V5</div>
+
+  <details>
+    <summary>Dificultades Estándar</summary>
+    <ul>
+      <li><strong>Fácil (1):</strong> Tarea rutinaria o bajo poca presión.</li>
+      <li><strong>Moderada (2):</strong> Exige cierta habilidad o atención.</li>
+      <li><strong>Difícil (3):</strong> Desafío exigente para profesionales.</li>
+      <li><strong>Muy Difícil (4):</strong> Prueba compleja bajo estrés extremo.</li>
+      <li><strong>Casi Imposible (5+):</strong> Hazaña legendaria o sobrehumana.</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary>Efectos de la Ansia y Compulsiones</summary>
+    <p><strong>Éxito Bestial:</strong> Ocurre al obtener un Par de 10s conteniendo al menos un 10 en dado de Ansia. Logras el objetivo pero la Bestia se manifiesta violentamente o deja rastros[cite: 15].</p>
+    <p><strong>Fallo Bestial / Compulsión:</strong> Ocurre al fallar la tirada y obtener al menos un 1 en dado de Ansia. Sufrirás una Compulsión de Clan o de la Bestia durante la escena[cite: 15].</p>
+  </details>
+
+  <details>
+    <summary>Tipos de Sangre y Resonancia</summary>
+    <ul>
+      <li><strong>Colérica (Enfado/Violencia):</strong> Potencia la Disciplina <em>Potencia</em> y <em>Celeridad</em>[cite: 25, 65].</li>
+      <li><strong>Melancólica (Tristeza/Apatía):</strong> Potencia la Disciplina <em>Ofuscación</em> y <em>Fortaleza</em>[cite: 25, 65].</li>
+      <li><strong>Flemática (Calma/Apatía):</strong> Potencia la Disciplina <em>Dominación</em> y <em>Auspex</em>[cite: 25, 65].</li>
+      <li><strong>Sanguínea (Pasión/Lujuria):</strong> Potencia la Disciplina <em>Presencia</em>[cite: 25, 65].</li>
+    </ul>
+  </details>
+
+</div>
+
+<script>
+// --- INICIALIZACIÓN DE TRACKERS ---
+const maxHealth = 6;
+const maxWillpower = 5;
+
+function initTrackers() {
+  const hArea = document.getElementById('healthCells');
+  const wArea = document.getElementById('willpowerCells');
+  hArea.innerHTML = '';
+  wArea.innerHTML = '';
+
+  for(let i=0; i<maxHealth; i++) {
+    let btn = document.createElement('div');
+    btn.className = 'cell-btn';
+    btn.innerText = ' ';
+    btn.onclick = () => toggleCell(btn);
+    hArea.appendChild(btn);
+  }
+
+  for(let i=0; i<maxWillpower; i++) {
+    let btn = document.createElement('div');
+    btn.className = 'cell-btn';
+    btn.innerText = ' ';
+    btn.onclick = () => toggleCell(btn);
+    wArea.appendChild(btn);
+  }
+}
+
+function toggleCell(btn) {
+  if (btn.innerText === ' ') {
+    btn.innerText = '/'; // Daño Superficial
+    btn.style.color = '#e67e22';
+  } else if (btn.innerText === '/') {
+    btn.innerText = 'X'; // Daño Agravado
+    btn.style.color = '#e74c3c';
+  } else {
+    btn.innerText = ' ';
+    btn.style.color = '#d35400';
+  }
+}
+
+function changeHunger(delta) {
+  const input = document.getElementById('hungerPool');
+  let val = parseInt(input.value) + delta;
+  if (val >= 0 && val <= 5) {
+    input.value = val;
+  }
+}
+
+// --- LÓGICA DE DADOS DE V5 ---
+function rollV5Dice() {
+  const pool = parseInt(document.getElementById('dicePool').value) || 1;
+  const hunger = Math.min(parseInt(document.getElementById('hungerPool').value) || 0, pool);
+  
+  const normalDiceCount = Math.max(0, pool - hunger);
+  const hungerDiceCount = hunger;
+
+  const diceArea = document.getElementById('diceArea');
+  const summary = document.getElementById('summary');
+  const status = document.getElementById('status');
+
+  // EFECTO ANIMACIÓN
+  diceArea.innerHTML = '<div class="status-msg">Rodando dados... 🎲</div>';
+  summary.innerText = '';
+  status.innerText = '';
+
+  setTimeout(() => {
+    let normalResults = [];
+    let hungerResults = [];
+    let successes = 0;
+    let normalTens = 0;
+    let hungerTens = 0;
+    let hungerOnes = 0;
+
+    for (let i = 0; i < normalDiceCount; i++) {
+      let val = Math.floor(Math.random() * 10) + 1;
+      normalResults.push(val);
+      if (val >= 6) successes++;
+      if (val === 10) normalTens++;
+    }
+
+    for (let i = 0; i < hungerDiceCount; i++) {
+      let val = Math.floor(Math.random() * 10) + 1;
+      hungerResults.push(val);
+      if (val >= 6) successes++;
+      if (val === 10) hungerTens++;
+      if (val === 1) hungerOnes++;
+    }
+
+    const totalTens = normalTens + hungerTens;
+    const criticalPairs = Math.floor(totalTens / 2);
+    const totalSuccesses = successes + (criticalPairs * 2);
+
+    diceArea.innerHTML = '';
+
+    normalResults.forEach(res => {
+      let d = document.createElement('div');
+      d.className = 'die die-normal' + (res >= 6 ? ' die-success' : '');
+      d.innerText = res;
+      diceArea.appendChild(d);
+    });
+
+    hungerResults.forEach(res => {
+      let d = document.createElement('div');
+      d.className = 'die die-hunger' + (res >= 6 ? ' die-success' : '');
+      d.innerText = res;
+      diceArea.appendChild(d);
+    });
+
+    summary.innerHTML = `Éxitos totales: <span style="color:#d35400; font-size:1.3em;">${totalSuccesses}</span>`;
+
+    if (criticalPairs > 0 && hungerTens > 0) {
+      status.className = "status-msg text-bestial";
+      status.innerText = "💥 ¡ÉXITO BESTIAL! La Bestia toma el control.";
+    } else if (totalSuccesses === 0 && hungerOnes > 0) {
+      status.className = "status-msg text-bestial";
+      status.innerText = "💀 ¡FALLO BESTIAL / COMPULSIÓN!";
+    } else if (criticalPairs > 0) {
+      status.className = "status-msg text-success";
+      status.innerText = "✨ ¡Éxito Crítico!";
+    } else if (totalSuccesses > 0) {
+      status.className = "status-msg text-success";
+      status.innerText = "Éxito conseguido.";
+    } else {
+      status.className = "status-msg text-fail";
+      status.innerText = "Fallo en la tirada.";
+    }
+  }, 250);
+}
+
+// --- LÓGICA CHEQUEO DE ENRUTAMIENTO (ROUSE CHECK) ---
+function rouseCheck() {
+  const result = Math.floor(Math.random() * 10) + 1;
+  const status = document.getElementById('status');
+  const diceArea = document.getElementById('diceArea');
+  const summary = document.getElementById('summary');
+
+  summary.innerText = "Chequeo de Enrutamiento (Rouse Check)";
+  diceArea.innerHTML = `<div class="die ${result >= 6 ? 'die-normal die-success' : 'die-hunger'}">${result}</div>`;
+
+  if (result >= 6) {
+    status.className = "status-msg text-success";
+    status.innerText = "🩸 CHEQUEO EXITOSO: Mantienes tu Ansia.";
+  } else {
+    status.className = "status-msg text-bestial";
+    status.innerText = "⚠️ CHEQUEO FALLIDO: Aumentas +1 de Ansia.";
+    changeHunger(1);
+  }
+}
+
+// Inicializar componentes al cargar
+window.onload = initTrackers;
+</script>
+
+</body>
+</html>
