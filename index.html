@@ -23,7 +23,7 @@
       padding: 20px;
       box-shadow: 0 4px 20px rgba(144, 12, 63, 0.3);
     }
-    h1, h2 {
+    h1 {
       font-family: 'Oswald', sans-serif;
       text-transform: uppercase;
       color: #900c3f;
@@ -135,16 +135,6 @@
       font-size: 1.2em;
       border-radius: 6px;
       box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
-      transition: transform 0.2s;
-    }
-    .die-rolling {
-      animation: shake 0.3s ease-in-out infinite;
-    }
-    @keyframes shake {
-      0% { transform: rotate(0deg); }
-      25% { transform: rotate(10deg); }
-      75% { transform: rotate(-10deg); }
-      100% { transform: rotate(0deg); }
     }
     .die-normal { background: #2a2a2a; color: #fff; border: 1px solid #444; }
     .die-hunger { background: #900c3f; color: #fff; border: 1px solid #ff2e63; }
@@ -160,7 +150,7 @@
     .text-bestial { color: #e74c3c; text-shadow: 0 0 8px #900c3f; }
     .text-fail { color: #e67e22; }
 
-    /* TRACKERS Y CONTADORES */
+    /* TRACKERS */
     .tracker-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -212,7 +202,6 @@
       cursor: pointer;
     }
 
-    /* DESPLEGABLES / ACCORDION */
     details {
       background: #1a1a1a;
       border: 1px solid #2a2a2a;
@@ -242,7 +231,7 @@
 <div class="app-container">
   <h1>🩸 Vampire V5 Companion</h1>
 
-  <!-- PANEL DE TRACKERS -->
+  <!-- TRACKERS -->
   <div class="tracker-grid">
     <div class="tracker-box">
       <label>Salud (Health)</label>
@@ -254,7 +243,7 @@
     </div>
   </div>
 
-  <!-- CONTROLES DE DADOS Y ANSIA -->
+  <!-- CONTROLES -->
   <div class="controls">
     <div class="control-group">
       <label>Reserva Total</label>
@@ -275,14 +264,14 @@
     <button class="btn-rouse" onclick="rouseCheck()">Enrutamiento 🩸</button>
   </div>
 
-  <!-- RESULTADOS DE LA TIRADA -->
+  <!-- RESULTADOS -->
   <div class="results-box">
     <div id="summary" style="font-weight: bold; font-size: 1.1em; text-align: center;">Tira los dados para ver el resultado...</div>
     <div id="status" class="status-msg"></div>
     <div id="diceArea" class="dice-container"></div>
   </div>
 
-  <!-- GUÍA RÁPIDA DE REGLAS V5 -->
+  <!-- GUÍA RÁPIDA -->
   <div class="section-title">📜 Referencia Rápida V5</div>
 
   <details>
@@ -298,24 +287,12 @@
 
   <details>
     <summary>Efectos de la Ansia y Compulsiones</summary>
-    <p><strong>Éxito Bestial:</strong> Ocurre al obtener un Par de 10s conteniendo al menos un 10 en dado de Ansia. Logras el objetivo pero la Bestia se manifiesta violentamente o deja rastros[cite: 15].</p>
-    <p><strong>Fallo Bestial / Compulsión:</strong> Ocurre al fallar la tirada y obtener al menos un 1 en dado de Ansia. Sufrirás una Compulsión de Clan o de la Bestia durante la escena[cite: 15].</p>
+    <p><strong>Éxito Bestial:</strong> Par de 10s conteniendo al menos un 10 en dado de Ansia. Logras el objetivo pero la Bestia se manifiesta violentamente.</p>
+    <p><strong>Fallo Bestial / Compulsión:</strong> Fallo con al menos un 1 en dado de Ansia. Sufrirás una Compulsión durante la escena.</p>
   </details>
-
-  <details>
-    <summary>Tipos de Sangre y Resonancia</summary>
-    <ul>
-      <li><strong>Colérica (Enfado/Violencia):</strong> Potencia la Disciplina <em>Potencia</em> y <em>Celeridad</em>[cite: 25, 65].</li>
-      <li><strong>Melancólica (Tristeza/Apatía):</strong> Potencia la Disciplina <em>Ofuscación</em> y <em>Fortaleza</em>[cite: 25, 65].</li>
-      <li><strong>Flemática (Calma/Apatía):</strong> Potencia la Disciplina <em>Dominación</em> y <em>Auspex</em>[cite: 25, 65].</li>
-      <li><strong>Sanguínea (Pasión/Lujuria):</strong> Potencia la Disciplina <em>Presencia</em>[cite: 25, 65].</li>
-    </ul>
-  </details>
-
 </div>
 
 <script>
-// --- INICIALIZACIÓN DE TRACKERS ---
 const maxHealth = 6;
 const maxWillpower = 5;
 
@@ -344,10 +321,10 @@ function initTrackers() {
 
 function toggleCell(btn) {
   if (btn.innerText === ' ') {
-    btn.innerText = '/'; // Daño Superficial
+    btn.innerText = '/';
     btn.style.color = '#e67e22';
   } else if (btn.innerText === '/') {
-    btn.innerText = 'X'; // Daño Agravado
+    btn.innerText = 'X';
     btn.style.color = '#e74c3c';
   } else {
     btn.innerText = ' ';
@@ -363,7 +340,6 @@ function changeHunger(delta) {
   }
 }
 
-// --- LÓGICA DE DADOS DE V5 ---
 function rollV5Dice() {
   const pool = parseInt(document.getElementById('dicePool').value) || 1;
   const hunger = Math.min(parseInt(document.getElementById('hungerPool').value) || 0, pool);
@@ -375,7 +351,6 @@ function rollV5Dice() {
   const summary = document.getElementById('summary');
   const status = document.getElementById('status');
 
-  // EFECTO ANIMACIÓN
   diceArea.innerHTML = '<div class="status-msg">Rodando dados... 🎲</div>';
   summary.innerText = '';
   status.innerText = '';
@@ -441,10 +416,9 @@ function rollV5Dice() {
       status.className = "status-msg text-fail";
       status.innerText = "Fallo en la tirada.";
     }
-  }, 250);
+  }, 200);
 }
 
-// --- LÓGICA CHEQUEO DE ENRUTAMIENTO (ROUSE CHECK) ---
 function rouseCheck() {
   const result = Math.floor(Math.random() * 10) + 1;
   const status = document.getElementById('status');
@@ -464,7 +438,6 @@ function rouseCheck() {
   }
 }
 
-// Inicializar componentes al cargar
 window.onload = initTrackers;
 </script>
 
