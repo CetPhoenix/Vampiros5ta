@@ -4,7 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vampiro V5 - Companion App | Nexo Alpha</title>
+
+  <!-- VÍNCULO MANIFEST PWA Y TEMATIZACIÓN NATIVA -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#900c3f">
+
+  <!-- FUENTES DE GOOGLE -->
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
   <style>
     body {
       background-color: #0d0d0d;
@@ -150,7 +157,7 @@
     .text-bestial { color: #e74c3c; text-shadow: 0 0 8px #900c3f; }
     .text-fail { color: #e67e22; }
 
-    /* TRACKERS */
+    /* TRACKERS DE SALUD Y VOLUNTAD */
     .tracker-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -202,6 +209,7 @@
       cursor: pointer;
     }
 
+    /* ACCORDION / GUÍA RÁPIDA */
     details {
       background: #1a1a1a;
       border: 1px solid #2a2a2a;
@@ -271,7 +279,7 @@
     <div id="diceArea" class="dice-container"></div>
   </div>
 
-  <!-- GUÍA RÁPIDA -->
+  <!-- GUÍA RÁPIDA DE REGLAS V5 -->
   <div class="section-title">📜 Referencia Rápida V5</div>
 
   <details>
@@ -293,6 +301,7 @@
 </div>
 
 <script>
+// --- INICIALIZACIÓN DE TRACKERS ---
 const maxHealth = 6;
 const maxWillpower = 5;
 
@@ -340,6 +349,7 @@ function changeHunger(delta) {
   }
 }
 
+// --- LÓGICA DE DADOS DE V5 ---
 function rollV5Dice() {
   const pool = parseInt(document.getElementById('dicePool').value) || 1;
   const hunger = Math.min(parseInt(document.getElementById('hungerPool').value) || 0, pool);
@@ -419,6 +429,7 @@ function rollV5Dice() {
   }, 200);
 }
 
+// --- CHEQUEO DE ENRUTAMIENTO (ROUSE CHECK) ---
 function rouseCheck() {
   const result = Math.floor(Math.random() * 10) + 1;
   const status = document.getElementById('status');
@@ -438,7 +449,19 @@ function rouseCheck() {
   }
 }
 
+// Inicializar trackers al cargar la página
 window.onload = initTrackers;
+</script>
+
+<!-- REGISTRO DEL SERVICE WORKER PARA FUNCIONAMIENTO OFFLINE -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
+      .catch(err => console.log('Error al registrar Service Worker:', err));
+  });
+}
 </script>
 
 </body>
