@@ -1,0 +1,23 @@
+{
+  "short_name": "Vampiro V5",
+  "name": "Vampiro V5 Companion — Nexo Alpha",
+  "description": "Lanzador de dados, contador de Ansia, seguimiento de Salud y Voluntad para Vampiro: La Mascarada 5.ª Edición.",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/1ZvK7L0/Nexo-Alpha-Logo-Gamer-Wargames.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://i.ibb.co/1ZvK7L0/Nexo-Alpha-Logo-Gamer-Wargames.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#0d0d0d",
+  "theme_color": "#900c3f",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "es"
+}
