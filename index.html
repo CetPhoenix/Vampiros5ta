@@ -42,7 +42,7 @@
       color: #d35400;
       border-bottom: 1px solid #333;
       padding-bottom: 5px;
-      margin-top: 20px;
+      margin-top: 25px;
       margin-bottom: 15px;
       font-size: 1.1em;
       font-family: 'Oswald', sans-serif;
@@ -69,16 +69,20 @@
       margin-bottom: 5px;
       text-transform: uppercase;
     }
-    input[type="number"] {
+    input[type="number"], input[type="text"] {
       width: 100%;
       background: #000;
       border: 1px solid #444;
       color: #fff;
+      font-size: 1em;
+      border-radius: 4px;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    input[type="number"] {
       font-size: 1.4em;
       text-align: center;
-      border-radius: 4px;
       padding: 5px 0;
-      box-sizing: border-box;
     }
     .btn-container {
       display: flex;
@@ -209,7 +213,7 @@
       cursor: pointer;
     }
 
-    /* ACCORDION / GUÍA RÁPIDA */
+    /* ACCORDION Y DICCIONARIO */
     details {
       background: #1a1a1a;
       border: 1px solid #2a2a2a;
@@ -232,6 +236,52 @@
       line-height: 1.4;
     }
     details ul { padding-left: 18px; }
+
+    /* ESTILOS DEL DICCIONARIO BÚSQUEDA */
+    .search-box {
+      margin-bottom: 12px;
+    }
+    .dict-card {
+      background: #161616;
+      border-left: 3px solid #900c3f;
+      border-radius: 4px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+    }
+    .dict-card.type-atributo { border-left-color: #3498db; }
+    .dict-card.type-habilidad { border-left-color: #2ecc71; }
+    .dict-card.type-disciplina { border-left-color: #900c3f; }
+    
+    .dict-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dict-title {
+      font-family: 'Oswald', sans-serif;
+      color: #fff;
+      font-size: 0.95em;
+      text-transform: uppercase;
+    }
+    .dict-tag {
+      font-size: 0.65em;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      font-weight: bold;
+      color: #fff;
+      background: #333;
+    }
+    .tag-atributo { background: #2980b9; }
+    .tag-habilidad { background: #27ae60; }
+    .tag-disciplina { background: #900c3f; }
+
+    .dict-desc {
+      font-size: 0.8em;
+      color: #aaa;
+      margin-top: 4px;
+      line-height: 1.3;
+    }
   </style>
 </head>
 <body>
@@ -251,7 +301,7 @@
     </div>
   </div>
 
-  <!-- CONTROLES -->
+  <!-- CONTROLES DE DADOS -->
   <div class="controls">
     <div class="control-group">
       <label>Reserva Total</label>
@@ -279,6 +329,16 @@
     <div id="diceArea" class="dice-container"></div>
   </div>
 
+  <!-- DICCIONARIO / BUSCADOR V5 -->
+  <div class="section-title">🔍 Diccionario de V5</div>
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Buscar Atributo, Habilidad o Disciplina..." onkeyup="filterDictionary()">
+  </div>
+
+  <div id="dictionaryList" style="max-height: 280px; overflow-y: auto; padding-right: 4px;">
+    <!-- El contenido se genera dinámicamente desde JavaScript -->
+  </div>
+
   <!-- GUÍA RÁPIDA DE REGLAS V5 -->
   <div class="section-title">📜 Referencia Rápida V5</div>
 
@@ -301,7 +361,77 @@
 </div>
 
 <script>
-// --- INICIALIZACIÓN DE TRACKERS ---
+// --- BASE DE DATOS DICCIONARIO V5 ---
+const dictionaryData = [
+  // ATRIBUTOS
+  { name: "Fuerza", type: "atributo", desc: "Potencia muscular. Sirve para combate cuerpo a cuerpo, romper estructuras y levantar peso." },
+  { name: "Destreza", type: "atributo", desc: "Agilidad y coordinación física. Para esquivar, disparar, correr y moverse en sigilo." },
+  { name: "Resistencia", type: "atributo", desc: "Tolerancia física y salud. Determina la barra total de Salud (Resistencia + 3)." },
+  { name: "Carisma", type: "atributo", desc: "Encanto natural y magnetismo social. Usado para convencer, liderar e inspirar." },
+  { name: "Manipulación", type: "atributo", desc: "Capacidad de engaño y persuasión astuta. Usado en subterfugio e intimidación." },
+  { name: "Compostura", type: "atributo", desc: "Autocontrol y sangre fría. Determina la Voluntad e impide entrar en Frenesí." },
+  { name: "Inteligencia", type: "atributo", desc: "Capacidad de razonamiento, memoria y deducción analítica." },
+  { name: "Astucia", type: "atributo", desc: "Mente rápida e instinto. Permite reaccionar a emboscadas y tomar decisiones al instante." },
+  { name: "Resolución", type: "atributo", desc: "Determinación mental y concentración para resistir coerción." },
+
+  // HABILIDADES
+  { name: "Pelea", type: "habilidad", desc: "Combate sin armas o con garras/mordiscos. Se combina con Fuerza o Destreza." },
+  { name: "Armas de Fuego", type: "habilidad", desc: "Uso y mantenimiento de pistolas, rifles y escopetas." },
+  { name: "Sigilo", type: "habilidad", desc: "Moverse sin hacer ruido u ocultarse en las sombras." },
+  { name: "Callejeo", type: "habilidad", desc: "Conocimiento del submundo criminal, bandas y contactos en la calle." },
+  { name: "Intimidación", type: "habilidad", desc: "Forzar a otros a obedecer mediante amenazas físicas o sociales." },
+  { name: "Investigación", type: "habilidad", desc: "Rastrear pistas, examinar escenas del crimen e inferir datos." },
+  { name: "Medicina", type: "habilidad", desc: "Tratar heridas, diagnosticar causas de muerte y analizar sangre." },
+  { name: "Ocultismo", type: "habilidad", desc: "Conocimiento de rituales, la Taumaturgia, magia de sangre y mitos oscuros." },
+  { name: "Tecnología", type: "habilidad", desc: "Hackear sistemas, manipular cámaras de seguridad y dispositivos." },
+  { name: "Trato con Animales", type: "habilidad", desc: "Comprender, calmar o adiestrar animales salvajes o domésticos." },
+
+  // DISCIPLINAS
+  { name: "Auspex", type: "disciplina", desc: "Sentidos sobrenaturales. Permite oír a distancia, ver en la oscuridad y leer auras de emoción." },
+  { name: "Celeridad", type: "disciplina", desc: "Velocidad sobrehumana. Otorga esquiva aumentada y ataques relámpago." },
+  { name: "Dominación", type: "disciplina", desc: "Control mental. Permite implantar órdenes verbales o borrar recuerdos a mortales." },
+  { name: "Fortaleza", type: "disciplina", desc: "Resistencia mística. Otorga blindaje contra daño físico y ataques de la mente." },
+  { name: "Magia de la Sangre (Taumaturgia)", type: "disciplina", desc: "Rituales antiguos para manipular la sangre, corroer superficies o analizar trazas de vampiros." },
+  { name: "Ofuscación", type: "disciplina", desc: "Invisibilidad mística. Permite desaparecer ante la vista de mortales y cámaras." },
+  { name: "Potencia", type: "disciplina", desc: "Fuerza devastadora sobrenatural. Rompe puertas, arranca metal o destruye enemigos de un golpe." },
+  { name: "Presencia", type: "disciplina", desc: "Aura de fascinación o terror sobrenatural. Seduce, paraliza de miedo o atrae masas." },
+  { name: "Protean (Protefacto)", type: "disciplina", desc: "Alteración corporal. Otorga visión nocturna ('Ojos de la Bestia') y garras afiladas." }
+];
+
+function renderDictionary(data) {
+  const container = document.getElementById('dictionaryList');
+  container.innerHTML = '';
+
+  if (data.length === 0) {
+    container.innerHTML = '<div style="color:#888; font-size:0.85em; text-align:center; padding:10px;">No se encontraron resultados...</div>';
+    return;
+  }
+
+  data.forEach(item => {
+    const card = document.createElement('div');
+    card.className = `dict-card type-${item.type}`;
+    card.innerHTML = `
+      <div class="dict-header">
+        <span class="dict-title">${item.name}</span>
+        <span class="dict-tag tag-${item.type}">${item.type}</span>
+      </div>
+      <div class="dict-desc">${item.desc}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function filterDictionary() {
+  const query = document.getElementById('searchInput').value.toLowerCase().trim();
+  const filtered = dictionaryData.filter(item => 
+    item.name.toLowerCase().includes(query) || 
+    item.desc.toLowerCase().includes(query) ||
+    item.type.toLowerCase().includes(query)
+  );
+  renderDictionary(filtered);
+}
+
+// --- TRACKERS ---
 const maxHealth = 6;
 const maxWillpower = 5;
 
@@ -449,11 +579,14 @@ function rouseCheck() {
   }
 }
 
-// Inicializar trackers al cargar la página
-window.onload = initTrackers;
+// Inicialización al cargar la página
+window.onload = () => {
+  initTrackers();
+  renderDictionary(dictionaryData);
+};
 </script>
 
-<!-- REGISTRO DEL SERVICE WORKER PARA FUNCIONAMIENTO OFFLINE -->
+<!-- REGISTRO DEL SERVICE WORKER -->
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
