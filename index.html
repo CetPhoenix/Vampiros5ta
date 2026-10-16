@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vampiro V5 - Companion App | Nexo Alpha | V1</title>
+  <title>Vampiro V5 - Companion App | Nexo Alpha</title>
 
   <!-- VÍNCULO MANIFEST PWA Y TEMATIZACIÓN NATIVA -->
   <link rel="manifest" href="./manifest.json">
@@ -248,8 +248,12 @@
       padding: 8px 12px;
       margin-bottom: 8px;
     }
-    .dict-card.type-atributo { border-left-color: #3498db; }
-    .dict-card.type-habilidad { border-left-color: #2ecc71; }
+    .dict-card.type-atributo-fisico { border-left-color: #3498db; }
+    .dict-card.type-atributo-social { border-left-color: #9b59b6; }
+    .dict-card.type-atributo-mental { border-left-color: #1abc9c; }
+    .dict-card.type-habilidad-fisica { border-left-color: #2ecc71; }
+    .dict-card.type-habilidad-social { border-left-color: #e67e22; }
+    .dict-card.type-habilidad-mental { border-left-color: #f1c40f; }
     .dict-card.type-disciplina { border-left-color: #900c3f; }
     
     .dict-header {
@@ -272,8 +276,12 @@
       color: #fff;
       background: #333;
     }
-    .tag-atributo { background: #2980b9; }
-    .tag-habilidad { background: #27ae60; }
+    .tag-atributo-fisico { background: #2980b9; }
+    .tag-atributo-social { background: #8e44ad; }
+    .tag-atributo-mental { background: #16a085; }
+    .tag-habilidad-fisica { background: #27ae60; }
+    .tag-habilidad-social { background: #d35400; }
+    .tag-habilidad-mental { background: #f39c12; color: #000; }
     .tag-disciplina { background: #900c3f; }
 
     .dict-desc {
@@ -287,7 +295,7 @@
 <body>
 
 <div class="app-container">
-  <h1>🩸 Vampire V5 Companion - V1</h1>
+  <h1>🩸 Vampire V5 Companion</h1>
 
   <!-- TRACKERS -->
   <div class="tracker-grid">
@@ -361,41 +369,66 @@
 </div>
 
 <script>
-// --- BASE DE DATOS DICCIONARIO V5 ---
+// --- BASE DE DATOS DICCIONARIO V5 CON CATEGORÍAS DIVIDIDAS ---
 const dictionaryData = [
-  // ATRIBUTOS
-  { name: "Fuerza", type: "atributo", desc: "Potencia muscular. Sirve para combate cuerpo a cuerpo, romper estructuras y levantar peso." },
-  { name: "Destreza", type: "atributo", desc: "Agilidad y coordinación física. Para esquivar, disparar, correr y moverse en sigilo." },
-  { name: "Resistencia", type: "atributo", desc: "Tolerancia física y salud. Determina la barra total de Salud (Resistencia + 3)." },
-  { name: "Carisma", type: "atributo", desc: "Encanto natural y magnetismo social. Usado para convencer, liderar e inspirar." },
-  { name: "Manipulación", type: "atributo", desc: "Capacidad de engaño y persuasión astuta. Usado en subterfugio e intimidación." },
-  { name: "Compostura", type: "atributo", desc: "Autocontrol y sangre fría. Determina la Voluntad e impide entrar en Frenesí." },
-  { name: "Inteligencia", type: "atributo", desc: "Capacidad de razonamiento, memoria y deducción analítica." },
-  { name: "Astucia", type: "atributo", desc: "Mente rápida e instinto. Permite reaccionar a emboscadas y tomar decisiones al instante." },
-  { name: "Resolución", type: "atributo", desc: "Determinación mental y concentración para resistir coerción." },
+  // ATRIBUTOS FÍSICOS
+  { name: "Fuerza", type: "atributo-fisico", label: "Atrib. Físico", desc: "Potencia muscular. Sirve para combate cuerpo a cuerpo, romper estructuras y levantar peso." },
+  { name: "Destreza", type: "atributo-fisico", label: "Atrib. Físico", desc: "Agilidad y coordinación física. Para esquivar, disparar, correr y moverse en sigilo." },
+  { name: "Resistencia", type: "atributo-fisico", label: "Atrib. Físico", desc: "Tolerancia física y salud. Determina la barra total de Salud (Resistencia + 3)." },
 
-  // HABILIDADES
-  { name: "Pelea", type: "habilidad", desc: "Combate sin armas o con garras/mordiscos. Se combina con Fuerza o Destreza." },
-  { name: "Armas de Fuego", type: "habilidad", desc: "Uso y mantenimiento de pistolas, rifles y escopetas." },
-  { name: "Sigilo", type: "habilidad", desc: "Moverse sin hacer ruido u ocultarse en las sombras." },
-  { name: "Callejeo", type: "habilidad", desc: "Conocimiento del submundo criminal, bandas y contactos en la calle." },
-  { name: "Intimidación", type: "habilidad", desc: "Forzar a otros a obedecer mediante amenazas físicas o sociales." },
-  { name: "Investigación", type: "habilidad", desc: "Rastrear pistas, examinar escenas del crimen e inferir datos." },
-  { name: "Medicina", type: "habilidad", desc: "Tratar heridas, diagnosticar causas de muerte y analizar sangre." },
-  { name: "Ocultismo", type: "habilidad", desc: "Conocimiento de rituales, la Taumaturgia, magia de sangre y mitos oscuros." },
-  { name: "Tecnología", type: "habilidad", desc: "Hackear sistemas, manipular cámaras de seguridad y dispositivos." },
-  { name: "Trato con Animales", type: "habilidad", desc: "Comprender, calmar o adiestrar animales salvajes o domésticos." },
+  // ATRIBUTOS SOCIALES
+  { name: "Carisma", type: "atributo-social", label: "Atrib. Social", desc: "Encanto natural y magnetismo social. Usado para convencer, liderar e inspirar." },
+  { name: "Manipulación", type: "atributo-social", label: "Atrib. Social", desc: "Capacidad de engaño y persuasión astuta. Usado en subterfugio e intimidación." },
+  { name: "Compostura", type: "atributo-social", label: "Atrib. Social", desc: "Autocontrol y sangre fría. Determina la Voluntad e impide entrar en Frenesí." },
+
+  // ATRIBUTOS MENTALES
+  { name: "Inteligencia", type: "atributo-mental", label: "Atrib. Mental", desc: "Capacidad de razonamiento, memoria y deducción analítica." },
+  { name: "Astucia", type: "atributo-mental", label: "Atrib. Mental", desc: "Mente rápida e instinto. Permite reaccionar a emboscadas y tomar decisiones al instante." },
+  { name: "Resolución", type: "atributo-mental", label: "Atrib. Mental", desc: "Determinación mental y concentración para resistir coerción." },
+
+  // HABILIDADES FÍSICAS
+  { name: "Armas de Fuego", type: "habilidad-fisica", label: "Hab. Física", desc: "Uso y mantenimiento de pistolas, rifles y escopetas." },
+  { name: "Artesanía", type: "habilidad-fisica", label: "Hab. Física", desc: "Capacidad para construir, reparar, modificar vehículos o crear objetos." },
+  { name: "Atletismo", type: "habilidad-fisica", label: "Hab. Física", desc: "Habilidad para correr, saltar, trepar, esquivar ataques y maniobras físicas." },
+  { name: "Conducir", type: "habilidad-fisica", label: "Hab. Física", desc: "Manejo experto de vehículos bajo presión, persecuciones y maniobras." },
+  { name: "Latrocinio", type: "habilidad-fisica", label: "Hab. Física", desc: "Forzar cerraduras, desactivar alarmas, robar bolsillos y saboteos." },
+  { name: "Pelea", type: "habilidad-fisica", label: "Hab. Física", desc: "Combate cuerpo a cuerpo sin armas, con garras o mordiscos." },
+  { name: "Pelea con Armas", type: "habilidad-fisica", label: "Hab. Física", desc: "Combate con armas blancas como cuchillos, bates, espadas o porras." },
+  { name: "Sigilo", type: "habilidad-fisica", label: "Hab. Física", desc: "Moverse sin hacer ruido u ocultarse en las sombras para no ser detectado." },
+  { name: "Supervivencia", type: "habilidad-fisica", label: "Hab. Física", desc: "Rastrear rastros, sobrevivir en entornos hostiles o zonas abandonadas." },
+
+  // HABILIDADES SOCIALES
+  { name: "Callejeo", type: "habilidad-social", label: "Hab. Social", desc: "Conocimiento del submundo criminal, bandas, rumores e informantes urbanos." },
+  { name: "Etiqueta", type: "habilidad-social", label: "Hab. Social", desc: "Comportamiento adecuado en la alta sociedad, Elysium y reuniones formales." },
+  { name: "Interpretación", type: "habilidad-social", label: "Hab. Social", desc: "Capacidad artística, actuación, música o captar la atención de audiencias." },
+  { name: "Intimidación", type: "habilidad-social", label: "Hab. Social", desc: "Forzar a otros a obedecer mediante amenazas físicas o presión social." },
+  { name: "Liderazgo", type: "habilidad-social", label: "Hab. Social", desc: "Capacidad para inspirar, comandar y guiar a otros en situaciones de tensión." },
+  { name: "Perspicacia", type: "habilidad-social", label: "Hab. Social", desc: "Capacidad para leer lenguaje corporal, detectar mentiras y comprender emociones." },
+  { name: "Persuasión", type: "habilidad-social", label: "Hab. Social", desc: "Convencer a otros mediante razonamiento lógico, encanto o negociación." },
+  { name: "Subterfugio", type: "habilidad-social", label: "Hab. Social", desc: "Arte del engaño, ocultar intenciones reales, mentir y disfrazarse." },
+  { name: "Trato con Animales", type: "habilidad-social", label: "Hab. Social", desc: "Comprender, calmar o adiestrar animales salvajes o domésticos." },
+
+  // HABILIDADES MENTALES
+  { name: "Academicismo", type: "habilidad-mental", label: "Hab. Mental", desc: "Conocimientos en humanidades, historia, literatura, leyes y ciencias sociales." },
+  { name: "Ciencias", type: "habilidad-mental", label: "Hab. Mental", desc: "Conocimiento de física, química, biología y principios científicos." },
+  { name: "Consciencia", type: "habilidad-mental", label: "Hab. Mental", desc: "Percepción del entorno, detectar emboscadas y prestar atención a detalles ocultos." },
+  { name: "Finanzas", type: "habilidad-mental", label: "Hab. Mental", desc: "Comprensión del dinero, mercados, inversiones, comercio y negocios." },
+  { name: "Investigación", type: "habilidad-mental", label: "Hab. Mental", desc: "Rastrear pistas, examinar escenas del crimen e inferir datos deduciendo hechos." },
+  { name: "Medicina", type: "habilidad-mental", label: "Hab. Mental", desc: "Tratar heridas, diagnosticar enfermedades, anatomía y análisis de sangre." },
+  { name: "Ocultismo", type: "habilidad-mental", label: "Hab. Mental", desc: "Conocimiento de rituales, Taumaturgia, magia de sangre y mitos del submundo." },
+  { name: "Política", type: "habilidad-mental", label: "Hab. Mental", desc: "Estructuras de poder, política mortal y maquinaciones internas de la Camarilla." },
+  { name: "Tecnología", type: "habilidad-mental", label: "Hab. Mental", desc: "Hackear sistemas informáticos, manipular cámaras de seguridad y electrónica." },
 
   // DISCIPLINAS
-  { name: "Auspex", type: "disciplina", desc: "Sentidos sobrenaturales. Permite oír a distancia, ver en la oscuridad y leer auras de emoción." },
-  { name: "Celeridad", type: "disciplina", desc: "Velocidad sobrehumana. Otorga esquiva aumentada y ataques relámpago." },
-  { name: "Dominación", type: "disciplina", desc: "Control mental. Permite implantar órdenes verbales o borrar recuerdos a mortales." },
-  { name: "Fortaleza", type: "disciplina", desc: "Resistencia mística. Otorga blindaje contra daño físico y ataques de la mente." },
-  { name: "Magia de la Sangre (Taumaturgia)", type: "disciplina", desc: "Rituales antiguos para manipular la sangre, corroer superficies o analizar trazas de vampiros." },
-  { name: "Ofuscación", type: "disciplina", desc: "Invisibilidad mística. Permite desaparecer ante la vista de mortales y cámaras." },
-  { name: "Potencia", type: "disciplina", desc: "Fuerza devastadora sobrenatural. Rompe puertas, arranca metal o destruye enemigos de un golpe." },
-  { name: "Presencia", type: "disciplina", desc: "Aura de fascinación o terror sobrenatural. Seduce, paraliza de miedo o atrae masas." },
-  { name: "Protean (Protefacto)", type: "disciplina", desc: "Alteración corporal. Otorga visión nocturna ('Ojos de la Bestia') y garras afiladas." }
+  { name: "Auspex", type: "disciplina", label: "Disciplina", desc: "Sentidos sobrenaturales. Permite oír a distancia, ver en la oscuridad y leer auras de emoción." },
+  { name: "Celeridad", type: "disciplina", label: "Disciplina", desc: "Velocidad sobrehumana. Otorga esquiva aumentada y ataques relámpago." },
+  { name: "Dominación", type: "disciplina", label: "Disciplina", desc: "Control mental. Permite implantar órdenes verbales o borrar recuerdos a mortales." },
+  { name: "Fortaleza", type: "disciplina", label: "Disciplina", desc: "Resistencia mística. Otorga blindaje contra daño físico y ataques de la mente." },
+  { name: "Magia de la Sangre (Taumaturgia)", type: "disciplina", label: "Disciplina", desc: "Rituales antiguos para manipular la sangre, corroer superficies o analizar trazas de vampiros." },
+  { name: "Ofuscación", type: "disciplina", label: "Disciplina", desc: "Invisibilidad mística. Permite desaparecer ante la vista de mortales y cámaras." },
+  { name: "Potencia", type: "disciplina", label: "Disciplina", desc: "Fuerza devastadora sobrenatural. Rompe puertas, arranca metal o destruye enemigos de un golpe." },
+  { name: "Presencia", type: "disciplina", label: "Disciplina", desc: "Aura de fascinación o terror sobrenatural. Seduce, paraliza de miedo o atrae masas." },
+  { name: "Protean (Protefacto)", type: "disciplina", label: "Disciplina", desc: "Alteración corporal. Otorga visión nocturna ('Ojos de la Bestia') y garras afiladas." }
 ];
 
 function renderDictionary(data) {
@@ -413,7 +446,7 @@ function renderDictionary(data) {
     card.innerHTML = `
       <div class="dict-header">
         <span class="dict-title">${item.name}</span>
-        <span class="dict-tag tag-${item.type}">${item.type}</span>
+        <span class="dict-tag tag-${item.type}">${item.label}</span>
       </div>
       <div class="dict-desc">${item.desc}</div>
     `;
@@ -426,7 +459,7 @@ function filterDictionary() {
   const filtered = dictionaryData.filter(item => 
     item.name.toLowerCase().includes(query) || 
     item.desc.toLowerCase().includes(query) ||
-    item.type.toLowerCase().includes(query)
+    item.label.toLowerCase().includes(query)
   );
   renderDictionary(filtered);
 }
